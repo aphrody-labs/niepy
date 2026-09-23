@@ -26,17 +26,30 @@ CATALOGUE = {
             "genre": "m",
             "voix": [{"cue": "v001", "fichier": "voix/c01000010/v001.wav", "ms": 1500}],
             "textures": [
-                {"source": "…/planche.g4tx", "fichier": "images/c01000010/planche.png", "role": "planche"},
-                {"source": "…/_face/x.g4tx", "fichier": "images/c01000010/face.png", "role": "expressions"},
+                {
+                    "source": "…/planche.g4tx",
+                    "fichier": "images/c01000010/planche.png",
+                    "role": "planche",
+                },
+                {
+                    "source": "…/_face/x.g4tx",
+                    "fichier": "images/c01000010/face.png",
+                    "role": "expressions",
+                },
             ],
             # `ligne` est un IDENTIFIANT, pas un numéro : c'est la forme que produit
             # réellement `nie vn export`. Un entier ici — ce qu'il y avait — laissait
             # passer un `int()` qui casse sur tout catalogue réel.
-            "dialogues": [
-                {"evenement": "ev01_01200", "ligne": "ev01_01200_010_010", "texte": "…"}
-            ],
+            "dialogues": [{"evenement": "ev01_01200", "ligne": "ev01_01200_010_010", "texte": "…"}],
         },
-        {"code": "c02000020", "nom": None, "genre": None, "voix": [], "textures": [], "dialogues": []},
+        {
+            "code": "c02000020",
+            "nom": None,
+            "genre": None,
+            "voix": [],
+            "textures": [],
+            "dialogues": [],
+        },
     ],
     "musique": [{"cue": "bgm_01", "fichier": "musique/bgm_01.wav", "ms": 60000}],
 }

@@ -201,7 +201,9 @@ def test_la_copie_profonde_ne_duplique_pas_le_handle() -> None:
 def test_le_budget_de_cache_borne_vraiment_la_memoire() -> None:
     """Le défaut natif est de 16 Gio : sans plafond, quelques lectures retiennent des gigaoctets."""
     with _vfs_ou_saut() as vfs:
-        textures = [e["path"] for e in vfs.entrees(0, 20000) if str(e["path"]).endswith(".g4tx")][:40]
+        textures = [e["path"] for e in vfs.entrees(0, 20000) if str(e["path"]).endswith(".g4tx")][
+            :40
+        ]
         if len(textures) < 10:
             pytest.skip("pas assez de textures dans la première tranche de l'index")
 

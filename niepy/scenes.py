@@ -191,7 +191,9 @@ class Scenario:
                 if langue in LANGUES:
                     scene_de(cle).sous_titres[langue] = chemin
 
-            elif chemin.startswith(_PREFIXE_SON) and chemin.endswith(".p3lip") and len(morceaux) >= 5:
+            elif (
+                chemin.startswith(_PREFIXE_SON) and chemin.endswith(".p3lip") and len(morceaux) >= 5
+            ):
                 langue = morceaux[3]
                 scene_de(cle).lipsync.setdefault(langue, []).append(chemin)
 
@@ -224,9 +226,7 @@ class Scenario:
                 f"    uv run python -m niepy scenes --index {source}"
             )
         charge = json.loads(source.read_text(encoding="utf-8"))
-        scenes = {
-            str(brut["cle"]): Scene.depuis_dict(brut) for brut in charge.get("scenes", [])
-        }
+        scenes = {str(brut["cle"]): Scene.depuis_dict(brut) for brut in charge.get("scenes", [])}
         return cls(scenes)
 
     # ── Consultation ─────────────────────────────────────────────────────────
