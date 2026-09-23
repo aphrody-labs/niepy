@@ -335,9 +335,7 @@ class StoryMode:
         genre = "phase" if chemin.startswith(_PREFIXE_PHASE) else "quest"
         # `c01_trigger_0.04.78.cfg.bin` / `.lua.bin` → identifiant `c01_trigger`.
         identifiant = nom.split(".", 1)[0]
-        trigger = triggers.setdefault(
-            identifiant, Trigger(identifiant=identifiant, genre=genre)
-        )
+        trigger = triggers.setdefault(identifiant, Trigger(identifiant=identifiant, genre=genre))
         if nom.endswith(".lua.bin"):
             trigger.lua = chemin
         elif nom.endswith(".cfg.bin"):
@@ -370,10 +368,7 @@ class StoryMode:
             )
         charge = json.loads(source.read_text(encoding="utf-8"))
         return cls(
-            {
-                str(b["cle"]): Cinematique.depuis_dict(b)
-                for b in charge.get("cinematiques", [])
-            },
+            {str(b["cle"]): Cinematique.depuis_dict(b) for b in charge.get("cinematiques", [])},
             {str(b["identifiant"]): Carte.depuis_dict(b) for b in charge.get("cartes", [])},
             {str(b["identifiant"]): Trigger.depuis_dict(b) for b in charge.get("triggers", [])},
             list(charge.get("tables_map") or ()),
@@ -434,9 +429,7 @@ class StoryMode:
             "avec_script": sum(1 for c in self.cinematiques.values() if c.scripts),
             "acteurs": len({a for c in self.cinematiques.values() for a in c.acteurs}),
             "cartes": len(self.cartes),
-            "cartes_par_zone": {
-                z: len(self.cartes_de(z)) for z in ZONES if self.cartes_de(z)
-            },
+            "cartes_par_zone": {z: len(self.cartes_de(z)) for z in ZONES if self.cartes_de(z)},
             "cartes_avec_navmesh": sum(1 for c in self.cartes.values() if c.a_navmesh),
             "tables_map": len(self.tables_map),
             "triggers": len(self.triggers),

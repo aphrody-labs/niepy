@@ -126,9 +126,7 @@ class Rendu:
             raise ErreurRendu(0, f"{cible} n'a pas été écrit", [str(self.binaire)])
         return cible
 
-    def capturer_region(
-        self, g4tx: str, region: str, sortie: str | os.PathLike[str]
-    ) -> Path:
+    def capturer_region(self, g4tx: str, region: str, sortie: str | os.PathLike[str]) -> Path:
         """Rogne une région d'atlas nommée et écrit ses pixels réels en PNG.
 
         C'est ce qui produit un sprite exact (une icône, un visage) plutôt que la planche

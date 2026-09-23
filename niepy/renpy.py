@@ -137,7 +137,9 @@ class Catalogue:
             _personnage_depuis(brut) for brut in donnees.get("personnages", [])
         ]
         self.musique: list[Piste] = [
-            Piste(cue=str(m.get("cue", "")), fichier=str(m.get("fichier", "")), ms=int(m.get("ms", 0)))
+            Piste(
+                cue=str(m.get("cue", "")), fichier=str(m.get("fichier", "")), ms=int(m.get("ms", 0))
+            )
             for m in donnees.get("musique", [])
         ]
 
@@ -152,8 +154,7 @@ class Catalogue:
         chemin = racine / "catalogue.json"
         if not chemin.is_file():
             raise FileNotFoundError(
-                f"{chemin} est absent. Produis-le avec :\n"
-                f"    nie vn export --out {racine}"
+                f"{chemin} est absent. Produis-le avec :\n    nie vn export --out {racine}"
             )
         with chemin.open("r", encoding="utf-8") as flux:
             return cls(json.load(flux), racine)
@@ -223,9 +224,7 @@ class Catalogue:
         lignes.append("# ── Musique ──────────────────────────────────────────────────")
         for piste in self.musique:
             nom = _identifiant_sur(piste.cue or Path(piste.fichier).stem)
-            lignes.append(
-                f'define {prefixe}_bgm_{nom} = "{_pose(self.racine, piste.fichier)}"'
-            )
+            lignes.append(f'define {prefixe}_bgm_{nom} = "{_pose(self.racine, piste.fichier)}"')
         lignes.append("")
 
         return "\n".join(lignes)
@@ -254,7 +253,9 @@ def _personnage_depuis(brut: dict[str, Any]) -> Personnage:
         nom=brut.get("nom"),
         genre=brut.get("genre"),
         voix=[
-            Voix(cue=str(v.get("cue", "")), fichier=str(v.get("fichier", "")), ms=int(v.get("ms", 0)))
+            Voix(
+                cue=str(v.get("cue", "")), fichier=str(v.get("fichier", "")), ms=int(v.get("ms", 0))
+            )
             for v in brut.get("voix", []) or []
         ],
         textures=[

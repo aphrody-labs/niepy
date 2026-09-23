@@ -81,8 +81,7 @@ def _cmd_data(args: argparse.Namespace) -> int:
     inconnues = [f for f in demandees if f not in FAMILLES]
     if inconnues:
         print(
-            f"famille(s) inconnue(s) : {', '.join(inconnues)}. "
-            f"Connues : {', '.join(FAMILLES)}",
+            f"famille(s) inconnue(s) : {', '.join(inconnues)}. Connues : {', '.join(FAMILLES)}",
             file=sys.stderr,
         )
         return 2
@@ -141,9 +140,7 @@ def _cmd_scenes(args: argparse.Namespace) -> int:
     from .vfs import Vfs
 
     if args.langue and args.langue not in LANGUES:
-        print(
-            f"langue inconnue : {args.langue}. Connues : {', '.join(LANGUES)}", file=sys.stderr
-        )
+        print(f"langue inconnue : {args.langue}. Connues : {', '.join(LANGUES)}", file=sys.stderr)
         return 2
 
     try:
@@ -244,8 +241,10 @@ def _cmd_story(args: argparse.Namespace) -> int:
                 print(f"cinématique inconnue : {args.cle}", file=sys.stderr)
                 return 2
             print(f"\n{cine.cle} — {cine.nb_plans} plan(s), {len(cine.acteurs)} acteur(s)")
-            print(f"  caméras {len(cine.cameras)}, scripts {len(cine.scripts)}, "
-                  f"packs {len(cine.packs)}, décors {len(cine.decors)}")
+            print(
+                f"  caméras {len(cine.cameras)}, scripts {len(cine.scripts)}, "
+                f"packs {len(cine.packs)}, décors {len(cine.decors)}"
+            )
             for plan in sorted(cine.plans):
                 print(f"    plan {plan} : {len(cine.plans[plan])} fichier(s)")
 
@@ -271,9 +270,7 @@ def _cmd_story(args: argparse.Namespace) -> int:
             )
 
         (sortie / "cartes.json").write_text(
-            json.dumps(
-                [c.vers_dict() for c in story.trier_cartes()], ensure_ascii=False, indent=2
-            ),
+            json.dumps([c.vers_dict() for c in story.trier_cartes()], ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
         (sortie / "triggers.json").write_text(

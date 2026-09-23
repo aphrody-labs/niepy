@@ -120,9 +120,7 @@ def chemin_bibliotheque() -> Path:
     if force:
         chemin = Path(force)
         if not chemin.is_file():
-            raise FileNotFoundError(
-                f"NIE_FFI_PATH pointe vers {chemin}, qui n'est pas un fichier."
-            )
+            raise FileNotFoundError(f"NIE_FFI_PATH pointe vers {chemin}, qui n'est pas un fichier.")
         return chemin
 
     racine = _racine_depot()

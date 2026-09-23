@@ -105,9 +105,7 @@ class Vfs:
         « loose » qui n'existent pas forcément sur une installation donnée. Ce test
         vérifie la présence du conteneur, jamais le contenu.
         """
-        return bool(
-            bibliotheque().nie_vfs_is_readable(self._vivant(), chemin.encode("utf-8"))
-        )
+        return bool(bibliotheque().nie_vfs_is_readable(self._vivant(), chemin.encode("utf-8")))
 
     def __contains__(self, chemin: object) -> bool:
         """`"data/…" in vfs` — même test que `existe`, sans jamais lever."""
