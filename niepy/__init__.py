@@ -33,7 +33,7 @@ from .renpy import Catalogue, Personnage
 from .scenes import LANGUES, LANGUES_DOUBLEES, Scenario, Scene, lignes_de
 from .story import ZONES, Carte, Cinematique, StoryMode, Trigger
 from .vfs import Vfs, racine_jeu
-from .native_bridge import IecodeBridge, chemin_iecode_ffi
+from .native_bridge import IecodeBridge, NieFfiPure, chemin_iecode_ffi
 
 __all__ = [
     "LANGUES",
@@ -46,6 +46,7 @@ __all__ = [
     "Cinematique",
     "ErreurRendu",
     "IecodeBridge",
+    "NieFfiPure",
     "Joueur",
     "Match",
     "Personnage",

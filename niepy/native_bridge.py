@@ -17,6 +17,7 @@ from ._ffi import _racine_depot
 
 __all__ = [
     "IecodeBridge",
+    "NieFfiPure",
     "chemin_iecode_ffi",
 ]
 
@@ -228,3 +229,76 @@ class IecodeBridge:
         b = cls._obtenir_bindings()
         buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
         return bool(b.lib.iecode_rdbn_is_valid(buf, len(donnees)))
+
+
+class NieFfiPure:
+    """Interface pure et complète vers les fonctionnalités natives de aphrody-nie-ffi (Rust)."""
+
+    @classmethod
+    def version(cls) -> str:
+        """Version du crate native nie_ffi."""
+        from .formats import version
+        return version()
+
+    @classmethod
+    def info_build(cls) -> dict[str, Any]:
+        """Informations de build et capacités du moteur Rust."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+        import json
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_build_info_json_out"):
+            out = NieBytes()
+            lib.nie_build_info_json_out(ctypes.byref(out))
+            b = prendre_octets(out)
+            return json.loads(b) if b else {}
+        return {}
+
+    @classmethod
+    def deriver_cle_cpk(cls, nom_fichier: str) -> int:
+        """Dérive la clé CPK depuis le nom de fichier."""
+        from ._ffi import bibliotheque
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_cpk_key_from_filename"):
+            return int(lib.nie_cpk_key_from_filename(nom_fichier.encode("utf-8")))
+        return 0
+
+    @classmethod
+    def sonder_cpk(cls, donnees: bytes) -> bool:
+        """Vérifie si le tampon est une archive CPK."""
+        from ._ffi import bibliotheque
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_cpk_probe"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            return bool(lib.nie_cpk_probe(buf, len(donnees)))
+        return donnees.startswith(b"CPK ")
+
+    @classmethod
+    def sonder_cfgbin(cls, donnees: bytes) -> int:
+        """Détecte le sous-type d'un cfg.bin (1 = RDBN, 2 = T2B, 0 = Inconnu)."""
+        from ._ffi import bibliotheque
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_cfgbin_probe"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            return int(lib.nie_cfgbin_probe(buf, len(donnees)))
+        return 1 if donnees.startswith(b"RDBN") else 0
+
+    @classmethod
+    def info_g4tx(cls, donnees: bytes) -> dict[str, Any]:
+        """Extrait la structure et les sous-textures d'un fichier G4TX."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+        import json
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_g4tx_info_json_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_g4tx_info_json_out(buf, len(donnees), ctypes.byref(out))
+            b = prendre_octets(out)
+            return json.loads(b) if b else {}
+        return {}

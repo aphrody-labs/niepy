@@ -278,3 +278,64 @@ def _declarer(lib: ctypes.CDLL) -> None:
 
     lib.nie_world_free.argtypes = [ctypes.c_void_p]
     lib.nie_world_free.restype = None
+
+    # ── Diagnostics & Métadonnées ────────────────────────────────────────────
+    if hasattr(lib, "nie_last_error_out"):
+        lib.nie_last_error_out.argtypes = [p_bytes]
+        lib.nie_last_error_out.restype = None
+
+    if hasattr(lib, "nie_build_info_json_out"):
+        lib.nie_build_info_json_out.argtypes = [p_bytes]
+        lib.nie_build_info_json_out.restype = None
+
+    # ── CPK & CRILAYLA (Rust natif) ──────────────────────────────────────────
+    if hasattr(lib, "nie_cpk_key_from_filename"):
+        lib.nie_cpk_key_from_filename.argtypes = [ctypes.c_char_p]
+        lib.nie_cpk_key_from_filename.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_cpk_decrypt_block"):
+        lib.nie_cpk_decrypt_block.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_uint64,
+            ctypes.c_uint32,
+        ]
+        lib.nie_cpk_decrypt_block.restype = None
+
+    if hasattr(lib, "nie_crilayla_is_compressed"):
+        lib.nie_crilayla_is_compressed.argtypes = [p_ubyte, ctypes.c_size_t]
+        lib.nie_crilayla_is_compressed.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_crilayla_decompress_out"):
+        lib.nie_crilayla_decompress_out.argtypes = [p_ubyte, ctypes.c_size_t, p_bytes]
+        lib.nie_crilayla_decompress_out.restype = None
+
+    if hasattr(lib, "nie_crilayla_compress_out"):
+        lib.nie_crilayla_compress_out.argtypes = [p_ubyte, ctypes.c_size_t, p_bytes]
+        lib.nie_crilayla_compress_out.restype = None
+
+    if hasattr(lib, "nie_cpk_probe"):
+        lib.nie_cpk_probe.argtypes = [p_ubyte, ctypes.c_size_t]
+        lib.nie_cpk_probe.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_cpk_header_json_out"):
+        lib.nie_cpk_header_json_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+            p_bytes,
+        ]
+        lib.nie_cpk_header_json_out.restype = None
+
+    # ── G4TX & CFGBIN ────────────────────────────────────────────────────────
+    if hasattr(lib, "nie_g4tx_info_json_out"):
+        lib.nie_g4tx_info_json_out.argtypes = [p_ubyte, ctypes.c_size_t, p_bytes]
+        lib.nie_g4tx_info_json_out.restype = None
+
+    if hasattr(lib, "nie_cfgbin_probe"):
+        lib.nie_cfgbin_probe.argtypes = [p_ubyte, ctypes.c_size_t]
+        lib.nie_cfgbin_probe.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_cfgbin_to_json_out"):
+        lib.nie_cfgbin_to_json_out.argtypes = [p_ubyte, ctypes.c_size_t, p_bytes]
+        lib.nie_cfgbin_to_json_out.restype = None

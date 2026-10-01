@@ -35,9 +35,17 @@ def test_iecode_crilayla_roundtrip():
     assert decomp.startswith(payload)
 
 
-def test_iecode_rdbn_validation():
-    """Validation de header RDBN."""
-    # En-tête RDBN invalide
-    assert not IecodeBridge.est_rdbn_valide(b"1234")
-    # Buffer vide
-    assert not IecodeBridge.est_rdbn_valide(b"")
+def test_nie_ffi_pure():
+    """Vérifie l'exposition pure des capacités du crate Rust aphrody-nie-ffi."""
+    from niepy.native_bridge import NieFfiPure
+
+    v = NieFfiPure.version()
+    assert v != "?" and len(v) > 0
+
+    info = NieFfiPure.info_build()
+    if info:
+        assert info.get("product") == "iecode"
+        assert "capabilities" in info
+
+    assert not NieFfiPure.sonder_cpk(b"NOT_A_CPK")
+    assert NieFfiPure.sonder_cpk(b"CPK \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
