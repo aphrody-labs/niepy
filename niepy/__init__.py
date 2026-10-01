@@ -33,6 +33,7 @@ from .renpy import Catalogue, Personnage
 from .scenes import LANGUES, LANGUES_DOUBLEES, Scenario, Scene, lignes_de
 from .story import ZONES, Carte, Cinematique, StoryMode, Trigger
 from .vfs import Vfs, racine_jeu
+from .native_bridge import IecodeBridge, chemin_iecode_ffi
 
 __all__ = [
     "LANGUES",
@@ -44,6 +45,7 @@ __all__ = [
     "Catalogue",
     "Cinematique",
     "ErreurRendu",
+    "IecodeBridge",
     "Joueur",
     "Match",
     "Personnage",
@@ -54,6 +56,7 @@ __all__ = [
     "Trigger",
     "Vfs",
     "chemin_bibliotheque",
+    "chemin_iecode_ffi",
     "chemin_nie_game",
     "decoder",
     "detecter",

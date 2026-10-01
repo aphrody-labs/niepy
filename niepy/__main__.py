@@ -293,6 +293,14 @@ def _cmd_info(_args: argparse.Namespace) -> int:
     from ._ffi import chemin_bibliotheque
 
     print(f"niepy        {__version__}")
+    from .native_bridge import IecodeBridge, chemin_iecode_ffi
+
+    p_iecode = chemin_iecode_ffi()
+    if p_iecode and IecodeBridge.est_disponible():
+        print(f"iecode_ffi   {p_iecode} (v{IecodeBridge.version()} - {IecodeBridge.schema()})")
+    else:
+        print("iecode_ffi   non disponible (construire via dotnet publish src/IECODE/Ffi)")
+
     try:
         chemin = chemin_bibliotheque()
         print(f"nie_ffi      {chemin}")
