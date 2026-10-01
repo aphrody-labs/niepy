@@ -46,9 +46,9 @@ def test_derive_cpk_key() -> None:
     assert derive_cpk_key("data/cpk_list.cfg.bin") == 0x1717E18E
     assert derive_cpk_key("C:\\Games\\Inazuma\\data\\cpk_list.cfg.bin") == 0x1717E18E
 
-    # Clé dérivée pour les autres fichiers
+    # Clé dérivée pour les autres fichiers (CRC32 réfléchi standard)
     k_common = derive_cpk_key("common.cpk")
-    assert k_common == crc32_nie(b"common.cpk")
+    assert k_common == crc32_level5(b"common.cpk")
 
 
 def test_decrypt_cpk_block_involution() -> None:

@@ -83,7 +83,7 @@ def derive_cpk_key(filename: str) -> int:
         return VIOLA_FIXED_KEY
     if not base:
         return 0
-    return crc32_nie(base.encode("utf-8"))
+    return crc32_level5(base.encode("utf-8"))
 
 
 def _update_crc_state(seed: int, k: Sequence[int]) -> int:
