@@ -200,7 +200,9 @@ class IecodeBridge:
             raise ValueError(f"Échec de décompression CRILAYLA (code d'erreur {ret})")
 
         try:
-            return bytes(ctypes.cast(out_ptr, ctypes.POINTER(ctypes.c_ubyte * out_len.value)).contents)
+            return bytes(
+                ctypes.cast(out_ptr, ctypes.POINTER(ctypes.c_ubyte * out_len.value)).contents
+            )
         finally:
             b.lib.iecode_bytes_free(out_ptr)
 
@@ -219,7 +221,9 @@ class IecodeBridge:
             raise ValueError(f"Échec de compression CRILAYLA (code d'erreur {ret})")
 
         try:
-            return bytes(ctypes.cast(out_ptr, ctypes.POINTER(ctypes.c_ubyte * out_len.value)).contents)
+            return bytes(
+                ctypes.cast(out_ptr, ctypes.POINTER(ctypes.c_ubyte * out_len.value)).contents
+            )
         finally:
             b.lib.iecode_bytes_free(out_ptr)
 
@@ -238,6 +242,7 @@ class NieFfiPure:
     def version(cls) -> str:
         """Version du crate native nie_ffi."""
         from .formats import version
+
         return version()
 
     @classmethod

@@ -26,7 +26,20 @@ Exemple complet :
 from __future__ import annotations
 
 from ._ffi import chemin_bibliotheque
-from .formats import decoder, detecter, g4tx_vers_png, nom_format, version
+from .formats import (
+    VfsFormatConsumer,
+    VfsFormatDescriptor,
+    VfsFormatId,
+    decoder,
+    detect_format,
+    detecter,
+    g4tx_vers_png,
+    get_format_descriptor,
+    list_vfs_formats,
+    nom_format,
+    validate_format,
+    version,
+)
 from .match import PAS_PAR_DEFAUT, STATS, Ballon, Joueur, Match, simuler_match
 from .rendu import ErreurRendu, Rendu, chemin_nie_game
 from .renpy import Catalogue, Personnage
@@ -56,15 +69,22 @@ __all__ = [
     "StoryMode",
     "Trigger",
     "Vfs",
+    "VfsFormatConsumer",
+    "VfsFormatDescriptor",
+    "VfsFormatId",
     "chemin_bibliotheque",
     "chemin_iecode_ffi",
     "chemin_nie_game",
     "decoder",
+    "detect_format",
     "detecter",
     "g4tx_vers_png",
+    "get_format_descriptor",
     "lignes_de",
+    "list_vfs_formats",
     "nom_format",
     "racine_jeu",
+    "validate_format",
     "version",
     "STATS",
     "simuler_match",

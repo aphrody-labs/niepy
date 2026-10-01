@@ -183,6 +183,34 @@ def _declarer(lib: ctypes.CDLL) -> None:
     lib.nie_format_name.argtypes = [ctypes.c_uint32]
     lib.nie_format_name.restype = ctypes.c_char_p
 
+    if hasattr(lib, "nie_format_extension"):
+        lib.nie_format_extension.argtypes = [ctypes.c_uint32]
+        lib.nie_format_extension.restype = ctypes.c_char_p
+
+        lib.nie_format_mime_type.argtypes = [ctypes.c_uint32]
+        lib.nie_format_mime_type.restype = ctypes.c_char_p
+
+        lib.nie_format_category.argtypes = [ctypes.c_uint32]
+        lib.nie_format_category.restype = ctypes.c_char_p
+
+        lib.nie_format_is_big_endian.argtypes = [ctypes.c_uint32]
+        lib.nie_format_is_big_endian.restype = ctypes.c_bool
+
+        lib.nie_format_supports_encryption.argtypes = [ctypes.c_uint32]
+        lib.nie_format_supports_encryption.restype = ctypes.c_bool
+
+        lib.nie_format_supports_compression.argtypes = [ctypes.c_uint32]
+        lib.nie_format_supports_compression.restype = ctypes.c_bool
+
+        lib.nie_format_count.argtypes = []
+        lib.nie_format_count.restype = ctypes.c_uint32
+
+        lib.nie_format_id_by_index.argtypes = [ctypes.c_uint32]
+        lib.nie_format_id_by_index.restype = ctypes.c_uint32
+
+        lib.nie_format_catalog_json_out.argtypes = [p_bytes]
+        lib.nie_format_catalog_json_out.restype = None
+
     lib.nie_decode_json_out.argtypes = [p_ubyte, ctypes.c_size_t, p_bytes]
     lib.nie_decode_json_out.restype = None
 
