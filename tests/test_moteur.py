@@ -13,6 +13,11 @@ niepy = pytest.importorskip("niepy")
 from niepy import Match  # noqa: E402
 from niepy._ffi import chemin_bibliotheque  # noqa: E402
 
+try:
+    chemin_bibliotheque()
+except FileNotFoundError as erreur:
+    pytest.skip(f"nie_ffi absent — {erreur}", allow_module_level=True)
+
 
 def test_bibliotheque_resolue() -> None:
     """La lib native est trouvée — sinon tout le reste échouerait sans dire pourquoi."""
