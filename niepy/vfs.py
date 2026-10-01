@@ -10,13 +10,178 @@ import ctypes
 import json
 import os
 from pathlib import Path
+from dataclasses import dataclass
 from types import TracebackType
 from typing import Any, Iterator
 
 from ._ffi import NieBytes, NieCacheStats, bibliotheque
 from .formats import decoder, prendre_octets
 
-__all__ = ["Vfs", "racine_jeu"]
+__all__ = [
+    "MockVfs",
+    "VFS_DIRECTORIES",
+    "VFS_PACK_RULES",
+    "Vfs",
+    "VfsDirectoryCategory",
+    "VfsPackRule",
+    "racine_jeu",
+]
+
+
+@dataclass(frozen=True)
+class VfsPackRule:
+    """Règle de routage et montage de paquet CRI CPK dans le VFS."""
+
+    pack_name: str
+    filename_mask: str
+    key_derivation: str
+    mount_priority: int
+    description: str
+    is_compressed: bool
+
+
+@dataclass(frozen=True)
+class VfsDirectoryCategory:
+    """Topologie et catégorie d'un répertoire racine du VFS."""
+
+    path: str
+    primary_extension: str
+    file_count_estimate: int
+    sample_files: list[str]
+    description: str
+
+
+#: Règles normatives de montage des paquets CPK sous data/packs/
+VFS_PACK_RULES: list[VfsPackRule] = [
+    VfsPackRule(
+        pack_name="common.cpk",
+        filename_mask="*common*.cpk",
+        key_derivation="filename-crc32",
+        mount_priority=100,
+        description="Base de données, tables personnages (chara_base), objets, compétences et courbes d'expérience",
+        is_compressed=True,
+    ),
+    VfsPackRule(
+        pack_name="menu.cpk",
+        filename_mask="*menu*.cpk",
+        key_derivation="filename-crc32",
+        mount_priority=90,
+        description="Interface utilisateur, réglages T2B, icônes 200_icon, portraits et polices de caractères",
+        is_compressed=True,
+    ),
+    VfsPackRule(
+        pack_name="model.cpk",
+        filename_mask="*model*.cpk",
+        key_derivation="filename-crc32",
+        mount_priority=80,
+        description="Modèles 3D (G4MD), tenues des équipes, stades et animations (AGI)",
+        is_compressed=True,
+    ),
+    VfsPackRule(
+        pack_name="dx11.cpk",
+        filename_mask="*dx11*.cpk",
+        key_derivation="filename-crc32",
+        mount_priority=70,
+        description="Shaders compilés DirectX 11, matériaux et textures GPU",
+        is_compressed=True,
+    ),
+    VfsPackRule(
+        pack_name="sound_asset.cpk",
+        filename_mask="*sound*.cpk",
+        key_derivation="filename-crc32",
+        mount_priority=60,
+        description="Pistes audio HCA, voix des personnages, commentaires de match et ambiances",
+        is_compressed=False,
+    ),
+    VfsPackRule(
+        pack_name="movie.cpk",
+        filename_mask="*movie*.cpk",
+        key_derivation="filename-crc32",
+        mount_priority=50,
+        description="Cinématiques vidéo plein écran, ouvertures d'anime et coups spéciaux USM",
+        is_compressed=False,
+    ),
+    VfsPackRule(
+        pack_name="event.cpk",
+        filename_mask="*event*.cpk",
+        key_derivation="filename-crc32",
+        mount_priority=40,
+        description="Cinématiques du mode histoire, chorégraphies MEVBIN et dialogues",
+        is_compressed=True,
+    ),
+    VfsPackRule(
+        pack_name="cpk_list.cfg.bin",
+        filename_mask="cpk_list.cfg.bin",
+        key_derivation="viola-fixed",
+        mount_priority=1000,
+        description="Manifeste maître routant les chemins logiques vers les CPK (clé Viola 0x1717E18E)",
+        is_compressed=False,
+    ),
+]
+
+#: Topologie des dossiers racine du VFS
+VFS_DIRECTORIES: list[VfsDirectoryCategory] = [
+    VfsDirectoryCategory(
+        path="data/common/",
+        primary_extension=".cfg.bin",
+        file_count_estimate=1420,
+        sample_files=[
+            "data/common/chara/chara_base.cfg.bin",
+            "data/common/item/item_config.cfg.bin",
+            "data/common/skill/skill_config.cfg.bin",
+            "data/common/growth/growth_table.cfg.bin",
+            "data/common/team/team_config.cfg.bin",
+        ],
+        description="Bases de données relationnelles RDBN dictant les statistiques, règles et tables de drop.",
+    ),
+    VfsDirectoryCategory(
+        path="data/menu/",
+        primary_extension=".g4tx",
+        file_count_estimate=3866,
+        sample_files=[
+            "data/menu/200_icon/icon_chara_c01000010.g4tx",
+            "data/menu/font/font_menu.g4tx",
+            "data/menu/ui/hud_match.cfg.bin",
+            "data/menu/emblem/emblem_t001.g4tx",
+        ],
+        description="Compositions d'interface HUD, spritesheets, glyphes de police et cartes de textures.",
+    ),
+    VfsDirectoryCategory(
+        path="data/model/",
+        primary_extension=".g4md",
+        file_count_estimate=12400,
+        sample_files=[
+            "data/model/chara/c01000010/c01000010.g4md",
+            "data/model/chara/c01000010/c01000010.g4sk",
+            "data/model/stadium/std_raimon/std_raimon.g4md",
+        ],
+        description="Maillages 3D, palettes d'os, squelettes, matériaux et pistes d'animation.",
+    ),
+    VfsDirectoryCategory(
+        path="data/event/",
+        primary_extension=".mevbin",
+        file_count_estimate=1438,
+        sample_files=[
+            "data/event/ev01/ev01_001.mevbin",
+            "data/event/ev01/ev01_001.g4cm",
+        ],
+        description="Chorégraphies cinématiques, caméras et scripts d'événements scénarisés.",
+    ),
+    VfsDirectoryCategory(
+        path="data/movie/",
+        primary_extension=".usm",
+        file_count_estimate=84,
+        sample_files=["data/movie/op01.usm", "data/movie/waza/waza_001.usm"],
+        description="Séquences vidéo CRI Movie 2 encodées en USM.",
+    ),
+    VfsDirectoryCategory(
+        path="data/sound/",
+        primary_extension=".acb",
+        file_count_estimate=320,
+        sample_files=["data/sound/bgm.acb", "data/sound/voice_chara.acb"],
+        description="Banques audio Criware Atom Craft (ACB/AWB) et voix de personnages.",
+    ),
+]
 
 
 def racine_jeu(explicite: str | os.PathLike[str] | None = None) -> Path:
@@ -150,6 +315,47 @@ class Vfs:
                     break
         return trouves
 
+    def info_fichier(self, chemin: str) -> dict[str, Any]:
+        """Retourne les métadonnées d'un fichier virtuel `{path, cpk, size, isReadable}`."""
+        lib = bibliotheque()
+        if hasattr(lib, "nie_vfs_file_info_json_out"):
+            sortie = NieBytes()
+            lib.nie_vfs_file_info_json_out(
+                self._vivant(), chemin.encode("utf-8"), ctypes.byref(sortie)
+            )
+            raw = prendre_octets(sortie)
+            if raw:
+                return json.loads(raw)
+        return {
+            "path": chemin,
+            "cpk": "unknown",
+            "size": 0,
+            "isReadable": self.existe(chemin),
+        }
+
+    def extraire(self, chemin_virtuel: str, destination: str | os.PathLike[str]) -> Path:
+        """Extrait un fichier virtuel vers le chemin cible sur le disque."""
+        donnees = self.lire(chemin_virtuel)
+        dest = Path(destination)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(donnees)
+        return dest
+
+    def extraire_lot(
+        self, motif: str, dossier_destination: str | os.PathLike[str], limite: int = 100
+    ) -> int:
+        """Extrait un lot de fichiers virtuels correspondant à un motif."""
+        chemins = self.chercher(motif, limite=limite)
+        dossier = Path(dossier_destination)
+        dossier.mkdir(parents=True, exist_ok=True)
+        extraits = 0
+        for ch in chemins:
+            rel = ch.lstrip("/")
+            cible = dossier / rel
+            self.extraire(ch, cible)
+            extraits += 1
+        return extraits
+
     # ── Mémoire ──────────────────────────────────────────────────────────────
 
     def stats_cache(self) -> dict[str, int]:
@@ -252,3 +458,106 @@ class Vfs:
 
     def __copy__(self) -> "Vfs":
         return self
+
+
+class MockVfs:
+    """Système de fichiers virtuel en mémoire pour tests et environnements sans dump de jeu."""
+
+    def __init__(self, racine: str | os.PathLike[str] | None = None) -> None:
+        self._racine = Path(racine) if racine is not None else Path.cwd()
+        self._fichiers: dict[str, bytes] = {}
+        self._ouvert = True
+
+    @property
+    def racine(self) -> Path:
+        """Racine simulée."""
+        return self._racine
+
+    def ajouter(self, chemin: str, donnees: bytes) -> None:
+        """Ajoute ou remplace un fichier virtuel en mémoire."""
+        self._fichiers[chemin.replace("\\", "/")] = bytes(donnees)
+
+    def __len__(self) -> int:
+        return len(self._fichiers)
+
+    def lire(self, chemin: str) -> bytes:
+        norm = chemin.replace("\\", "/")
+        if norm not in self._fichiers:
+            raise FileNotFoundError(f"absent du VFS (ou vide) : {chemin}")
+        return self._fichiers[norm]
+
+    def existe(self, chemin: str) -> bool:
+        return chemin.replace("\\", "/") in self._fichiers
+
+    def __contains__(self, chemin: object) -> bool:
+        return isinstance(chemin, str) and self.existe(chemin)
+
+    def charger(self, chemin: str) -> Any:
+        return decoder(self.lire(chemin))
+
+    def entrees(self, offset: int = 0, limite: int = 5000) -> list[dict[str, Any]]:
+        cles = sorted(self._fichiers.keys())[offset : offset + limite]
+        return [
+            {"path": k, "cpk": "mock.cpk", "size": len(self._fichiers[k]), "isReadable": True}
+            for k in cles
+        ]
+
+    def parcourir(self, par: int = 5000) -> Iterator[dict[str, Any]]:
+        offset = 0
+        while True:
+            lot = self.entrees(offset, par)
+            if not lot:
+                return
+            yield from lot
+            offset += len(lot)
+
+    def chercher(self, motif: str, limite: int = 200) -> list[str]:
+        motif_l = motif.casefold()
+        trouves = [k for k in sorted(self._fichiers.keys()) if motif_l in k.casefold()]
+        return trouves[:limite]
+
+    def info_fichier(self, chemin: str) -> dict[str, Any]:
+        norm = chemin.replace("\\", "/")
+        if norm in self._fichiers:
+            return {
+                "path": norm,
+                "cpk": "mock.cpk",
+                "size": len(self._fichiers[norm]),
+                "isReadable": True,
+            }
+        return {"path": norm, "cpk": "", "size": 0, "isReadable": False}
+
+    def extraire(self, chemin_virtuel: str, destination: str | os.PathLike[str]) -> Path:
+        donnees = self.lire(chemin_virtuel)
+        dest = Path(destination)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(donnees)
+        return dest
+
+    def extraire_lot(
+        self, motif: str, dossier_destination: str | os.PathLike[str], limite: int = 100
+    ) -> int:
+        chemins = self.chercher(motif, limite=limite)
+        dossier = Path(dossier_destination)
+        dossier.mkdir(parents=True, exist_ok=True)
+        extraits = 0
+        for ch in chemins:
+            rel = ch.lstrip("/")
+            cible = dossier / rel
+            self.extraire(ch, cible)
+            extraits += 1
+        return extraits
+
+    def fermer(self) -> None:
+        self._ouvert = False
+
+    def __enter__(self) -> "MockVfs":
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
+        self.fermer()

@@ -367,3 +367,137 @@ def _declarer(lib: ctypes.CDLL) -> None:
     if hasattr(lib, "nie_cfgbin_to_json_out"):
         lib.nie_cfgbin_to_json_out.argtypes = [p_ubyte, ctypes.c_size_t, p_bytes]
         lib.nie_cfgbin_to_json_out.restype = None
+
+    # ── CPK Extraction & Queries ─────────────────────────────────────────────
+    if hasattr(lib, "nie_cpk_list_json_out"):
+        lib.nie_cpk_list_json_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+            p_bytes,
+        ]
+        lib.nie_cpk_list_json_out.restype = None
+
+    if hasattr(lib, "nie_cpk_extract_entry_out"):
+        lib.nie_cpk_extract_entry_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+            ctypes.c_size_t,
+            p_bytes,
+        ]
+        lib.nie_cpk_extract_entry_out.restype = None
+
+    if hasattr(lib, "nie_cpk_extract_by_name_out"):
+        lib.nie_cpk_extract_by_name_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+            ctypes.c_char_p,
+            p_bytes,
+        ]
+        lib.nie_cpk_extract_by_name_out.restype = None
+
+    if hasattr(lib, "nie_rdbn_entry_query_json_out"):
+        lib.nie_rdbn_entry_query_json_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+            p_bytes,
+        ]
+        lib.nie_rdbn_entry_query_json_out.restype = None
+
+    # ── G4TX Subtextures & Probe ────────────────────────────────────────────
+    if hasattr(lib, "nie_g4tx_probe"):
+        lib.nie_g4tx_probe.argtypes = [p_ubyte, ctypes.c_size_t]
+        lib.nie_g4tx_probe.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_g4tx_to_rgba_out"):
+        lib.nie_g4tx_to_rgba_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            p_bytes,
+            ctypes.POINTER(ctypes.c_uint32),
+            ctypes.POINTER(ctypes.c_uint32),
+        ]
+        lib.nie_g4tx_to_rgba_out.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_g4tx_subtexture_to_png_out"):
+        lib.nie_g4tx_subtexture_to_png_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+            p_bytes,
+        ]
+        lib.nie_g4tx_subtexture_to_png_out.restype = None
+
+    # ── VFS File Info ────────────────────────────────────────────────────────
+    if hasattr(lib, "nie_vfs_file_info_json_out"):
+        lib.nie_vfs_file_info_json_out.argtypes = [
+            ctypes.c_void_p,
+            ctypes.c_char_p,
+            p_bytes,
+        ]
+        lib.nie_vfs_file_info_json_out.restype = None
+
+    # ── Sauvegardes Lives (002AB8F4-*) ───────────────────────────────────────
+    if hasattr(lib, "nie_save_probe"):
+        lib.nie_save_probe.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+        ]
+        lib.nie_save_probe.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_save_summary_json_out"):
+        lib.nie_save_summary_json_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+            p_bytes,
+        ]
+        lib.nie_save_summary_json_out.restype = None
+
+    if hasattr(lib, "nie_save_extract_blob_out"):
+        lib.nie_save_extract_blob_out.argtypes = [
+            p_ubyte,
+            ctypes.c_size_t,
+            ctypes.c_char_p,
+            ctypes.c_size_t,
+            p_bytes,
+        ]
+        lib.nie_save_extract_blob_out.restype = None
+
+    # ── CRand (Mersenne Twister MT19937) ────────────────────────────────────
+    if hasattr(lib, "nie_crc32_nie"):
+        lib.nie_crc32_nie.argtypes = [p_ubyte, ctypes.c_size_t]
+        lib.nie_crc32_nie.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_crand_new"):
+        lib.nie_crand_new.argtypes = [ctypes.c_uint32]
+        lib.nie_crand_new.restype = ctypes.c_void_p
+
+    if hasattr(lib, "nie_crand_from_u64"):
+        lib.nie_crand_from_u64.argtypes = [ctypes.c_uint64]
+        lib.nie_crand_from_u64.restype = ctypes.c_void_p
+
+    if hasattr(lib, "nie_crand_next_u32"):
+        lib.nie_crand_next_u32.argtypes = [ctypes.c_void_p]
+        lib.nie_crand_next_u32.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_crand_bounded"):
+        lib.nie_crand_bounded.argtypes = [ctypes.c_void_p, ctypes.c_uint32]
+        lib.nie_crand_bounded.restype = ctypes.c_uint32
+
+    if hasattr(lib, "nie_crand_next_f32"):
+        lib.nie_crand_next_f32.argtypes = [ctypes.c_void_p]
+        lib.nie_crand_next_f32.restype = ctypes.c_float
+
+    if hasattr(lib, "nie_crand_free"):
+        lib.nie_crand_free.argtypes = [ctypes.c_void_p]
+        lib.nie_crand_free.restype = None
+
+    # ── Émulateur & Registre ─────────────────────────────────────────────────
+    if hasattr(lib, "nie_emu_registry_json_out"):
+        lib.nie_emu_registry_json_out.argtypes = [p_bytes]
+        lib.nie_emu_registry_json_out.restype = None

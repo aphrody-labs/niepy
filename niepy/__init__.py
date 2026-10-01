@@ -1,38 +1,32 @@
-"""`niepy` — la porte d'entrée Python vers le moteur et les données de *nie*.
+"""`niepy` — la porte d'entrée Python vers le moteur, les données et l'outillage de *nie*.
 
-Trois usages, du plus simple au plus engageant :
-
-1. **Lire le jeu** — le VFS et les décodeurs de formats, via `Vfs` et `decoder`.
-2. **Faire tourner le jeu** — la simulation de match déterministe, via `Match`.
-3. **Alimenter un visual novel** — le catalogue d'assets exporté, via `renpy.Catalogue`.
-
-Tout passe par `nie_ffi`, la bibliothèque native construite depuis les crates Rust du dépôt.
-Il faut donc l'avoir construite au moins une fois :
-
-    cargo build -p nie-ffi --release
-
-Exemple complet :
-
-    from niepy import Match, Vfs
-
-    with Vfs() as vfs:
-        print(len(vfs), "entrées indexées")
-
-    with Match() as m:
-        m.avancer(90.0)
-        print("score final", m.score)
+Couvre l'intégralité du Virtual File System (VFS), les 28 formats binaires canoniques,
+la cryptographie et compression CRI / Level-5, et la spécification de rétro-ingénierie
+de `nie.exe`.
 """
 
 from __future__ import annotations
 
 from ._ffi import chemin_bibliotheque
+from .crypto import (
+    compress_crilayla,
+    crc32_level5,
+    crc32_nie,
+    decompress_crilayla,
+    decrypt_cpk_block,
+    derive_cpk_key,
+    is_crilayla,
+)
 from .formats import (
+    FORMAT_CATALOG_STATIC,
     VfsFormatConsumer,
     VfsFormatDescriptor,
     VfsFormatId,
     decoder,
     detect_format,
+    detect_format_pure,
     detecter,
+    detecter_pur,
     g4tx_vers_png,
     get_format_descriptor,
     list_vfs_formats,
@@ -41,54 +35,169 @@ from .formats import (
     version,
 )
 from .match import PAS_PAR_DEFAUT, STATS, Ballon, Joueur, Match, simuler_match
+from .native_bridge import IecodeBridge, NieFfiPure, chemin_iecode_ffi
+from .nie_re import (
+    CRI_ENCRYPTED_TABLE_MAGIC,
+    CRand,
+    CRITICAL_OFFSETS,
+    CRYPTO_CONSTANTS,
+    IMAGE_BASE,
+    LEVEL5_CRC32_POLYNOMIAL,
+    LIVES_BLOB_MAGIC,
+    LIVES_SAVE_CONST2,
+    LIVES_SAVE_HEADER_MAGIC,
+    MEMORY_STRUCTURES,
+    NieCryptoConstant,
+    NieMemoryOffset,
+    NieMemoryStructure,
+    NieReMap,
+    NieRttiClass,
+    RTTI_CLASSES,
+    STEAM_APP_ID,
+    TARGET_BINARY,
+    TOTAL_FUNCTIONS_COUNT,
+    VIOLA_FIXED_KEY,
+    get_nie_re_map,
+)
+from .parsers import (
+    CpkHeaderInfo,
+    G4txHeaderInfo,
+    G4txSubTexture,
+    G4txTexture,
+    RdbnHeaderInfo,
+    cpk_extract_by_name,
+    cpk_extract_entry,
+    cpk_info,
+    cpk_list_entries,
+    g4tx_info,
+    g4tx_subtexture_to_png,
+    is_cpk,
+    is_g4tx,
+    is_live_save,
+    is_rdbn,
+    is_t2b,
+    parse_cpk_header,
+    parse_g4tx_header,
+    parse_rdbn_header,
+    rdbn_query_table,
+    rdbn_to_json,
+    save_extract_blob,
+    save_summary,
+)
 from .rendu import ErreurRendu, Rendu, chemin_nie_game
 from .renpy import Catalogue, Personnage
 from .scenes import LANGUES, LANGUES_DOUBLEES, Scenario, Scene, lignes_de
 from .story import ZONES, Carte, Cinematique, StoryMode, Trigger
-from .vfs import Vfs, racine_jeu
-from .native_bridge import IecodeBridge, NieFfiPure, chemin_iecode_ffi
+from .vfs import (
+    VFS_DIRECTORIES,
+    VFS_PACK_RULES,
+    MockVfs,
+    Vfs,
+    VfsDirectoryCategory,
+    VfsPackRule,
+    racine_jeu,
+)
 
 __all__ = [
+    "CRI_ENCRYPTED_TABLE_MAGIC",
+    "CRITICAL_OFFSETS",
+    "CRYPTO_CONSTANTS",
+    "CRand",
+    "CpkHeaderInfo",
+    "FORMAT_CATALOG_STATIC",
+    "G4txHeaderInfo",
+    "G4txSubTexture",
+    "G4txTexture",
+    "IMAGE_BASE",
+    "IecodeBridge",
     "LANGUES",
     "LANGUES_DOUBLEES",
+    "LEVEL5_CRC32_POLYNOMIAL",
+    "LIVES_BLOB_MAGIC",
+    "LIVES_SAVE_CONST2",
+    "LIVES_SAVE_HEADER_MAGIC",
+    "MEMORY_STRUCTURES",
+    "MockVfs",
+    "NieCryptoConstant",
+    "NieFfiPure",
+    "NieMemoryOffset",
+    "NieMemoryStructure",
+    "NieReMap",
+    "NieRttiClass",
     "PAS_PAR_DEFAUT",
+    "RTTI_CLASSES",
+    "RdbnHeaderInfo",
+    "STEAM_APP_ID",
+    "STATS",
+    "StoryMode",
+    "TARGET_BINARY",
+    "TOTAL_FUNCTIONS_COUNT",
+    "Trigger",
+    "VFS_DIRECTORIES",
+    "VFS_PACK_RULES",
+    "VIOLA_FIXED_KEY",
+    "Vfs",
+    "VfsDirectoryCategory",
+    "VfsFormatConsumer",
+    "VfsFormatDescriptor",
+    "VfsFormatId",
+    "VfsPackRule",
     "ZONES",
     "Ballon",
     "Carte",
     "Catalogue",
     "Cinematique",
     "ErreurRendu",
-    "IecodeBridge",
-    "NieFfiPure",
     "Joueur",
     "Match",
     "Personnage",
     "Rendu",
     "Scenario",
     "Scene",
-    "StoryMode",
-    "Trigger",
-    "Vfs",
-    "VfsFormatConsumer",
-    "VfsFormatDescriptor",
-    "VfsFormatId",
     "chemin_bibliotheque",
     "chemin_iecode_ffi",
     "chemin_nie_game",
+    "compress_crilayla",
+    "cpk_extract_by_name",
+    "cpk_extract_entry",
+    "cpk_info",
+    "cpk_list_entries",
+    "crc32_level5",
+    "crc32_nie",
     "decoder",
+    "decompress_crilayla",
+    "decrypt_cpk_block",
+    "derive_cpk_key",
     "detect_format",
+    "detect_format_pure",
     "detecter",
+    "detecter_pur",
+    "g4tx_info",
+    "g4tx_subtexture_to_png",
     "g4tx_vers_png",
     "get_format_descriptor",
+    "get_nie_re_map",
+    "is_cpk",
+    "is_crilayla",
+    "is_g4tx",
+    "is_live_save",
+    "is_rdbn",
+    "is_t2b",
     "lignes_de",
     "list_vfs_formats",
     "nom_format",
+    "parse_cpk_header",
+    "parse_g4tx_header",
+    "parse_rdbn_header",
     "racine_jeu",
+    "rdbn_query_table",
+    "rdbn_to_json",
+    "save_extract_blob",
+    "save_summary",
+    "simuler_match",
     "validate_format",
     "version",
-    "STATS",
-    "simuler_match",
 ]
 
-#: Version de la bibliothèque Python. Distincte de `version()`, qui rend celle du crate natif.
-__version__ = "0.1.0"
+#: Version de la bibliothèque Python.
+__version__ = "0.2.0"

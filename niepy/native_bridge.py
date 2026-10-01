@@ -307,3 +307,208 @@ class NieFfiPure:
             b = prendre_octets(out)
             return json.loads(b) if b else {}
         return {}
+
+    @classmethod
+    def crc32_nie(cls, donnees: bytes) -> int:
+        """Calcule l'accumulateur brut CRC32 sans inversion (poly 0xEDB88320)."""
+        from ._ffi import bibliotheque
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_crc32_nie"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            return int(lib.nie_crc32_nie(buf, len(donnees)))
+        from .crypto import crc32_nie
+
+        return crc32_nie(donnees)
+
+    @classmethod
+    def cpk_lister(cls, donnees: bytes, nom_fichier: str = "") -> dict[str, Any]:
+        """Liste l'ensemble des entrées d'un conteneur CPK."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+        import json
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_cpk_list_json_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_cpk_list_json_out(
+                buf, len(donnees), nom_fichier.encode("utf-8"), ctypes.byref(out)
+            )
+            b = prendre_octets(out)
+            return json.loads(b) if b else {}
+        return {}
+
+    @classmethod
+    def cpk_extraire_entree(cls, donnees: bytes, nom_fichier: str, index: int) -> bytes:
+        """Extrait une entrée CPK par son indice ordinal."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_cpk_extract_entry_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_cpk_extract_entry_out(
+                buf, len(donnees), nom_fichier.encode("utf-8"), index, ctypes.byref(out)
+            )
+            return prendre_octets(out)
+        return b""
+
+    @classmethod
+    def cpk_extraire_par_nom(cls, donnees: bytes, nom_fichier: str, nom_entree: str) -> bytes:
+        """Extrait une entrée CPK par son nom interne."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_cpk_extract_by_name_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_cpk_extract_by_name_out(
+                buf,
+                len(donnees),
+                nom_fichier.encode("utf-8"),
+                nom_entree.encode("utf-8"),
+                ctypes.byref(out),
+            )
+            return prendre_octets(out)
+        return b""
+
+    @classmethod
+    def cfgbin_vers_json(cls, donnees: bytes) -> dict[str, Any]:
+        """Convertit un fichier RDBN / T2B en JSON canonique."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+        import json
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_cfgbin_to_json_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_cfgbin_to_json_out(buf, len(donnees), ctypes.byref(out))
+            b = prendre_octets(out)
+            return json.loads(b) if b else {}
+        return {}
+
+    @classmethod
+    def rdbn_requete_table(cls, donnees: bytes, nom_table: str) -> dict[str, Any] | None:
+        """Extrait une table nommée d'un fichier RDBN."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+        import json
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_rdbn_entry_query_json_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_rdbn_entry_query_json_out(
+                buf, len(donnees), nom_table.encode("utf-8"), ctypes.byref(out)
+            )
+            b = prendre_octets(out)
+            return json.loads(b) if b else None
+        return None
+
+    @classmethod
+    def g4tx_sonder(cls, donnees: bytes) -> bool:
+        """Vérifie si le tampon est un conteneur G4TX."""
+        from ._ffi import bibliotheque
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_g4tx_probe"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            return bool(lib.nie_g4tx_probe(buf, len(donnees)))
+        return donnees.startswith(b"G4TX")
+
+    @classmethod
+    def g4tx_sous_texture_vers_png(cls, donnees: bytes, nom_sous_texture: str) -> bytes:
+        """Décode une sous-texture nommée en PNG."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_g4tx_subtexture_to_png_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_g4tx_subtexture_to_png_out(
+                buf, len(donnees), nom_sous_texture.encode("utf-8"), ctypes.byref(out)
+            )
+            return prendre_octets(out)
+        return b""
+
+    @classmethod
+    def vfs_info_fichier(cls, handle_vfs: int, chemin_interne: str) -> dict[str, Any]:
+        """Retourne les métadonnées d'un fichier virtuel."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+        import json
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_vfs_file_info_json_out"):
+            out = NieBytes()
+            lib.nie_vfs_file_info_json_out(
+                handle_vfs, chemin_interne.encode("utf-8"), ctypes.byref(out)
+            )
+            b = prendre_octets(out)
+            return json.loads(b) if b else {}
+        return {}
+
+    @classmethod
+    def save_sonder(cls, donnees: bytes, nom_fichier: str) -> bool:
+        """Vérifie si le tampon est une sauvegarde Lives valide."""
+        from ._ffi import bibliotheque
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_save_probe"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            return bool(lib.nie_save_probe(buf, len(donnees), nom_fichier.encode("utf-8")))
+        return False
+
+    @classmethod
+    def save_resume(cls, donnees: bytes, nom_fichier: str) -> dict[str, Any]:
+        """Déchiffre et résume une sauvegarde Lives."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+        import json
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_save_summary_json_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_save_summary_json_out(
+                buf, len(donnees), nom_fichier.encode("utf-8"), ctypes.byref(out)
+            )
+            b = prendre_octets(out)
+            return json.loads(b) if b else {}
+        return {}
+
+    @classmethod
+    def save_extraire_blob(cls, donnees: bytes, nom_fichier: str, index_blob: int) -> bytes:
+        """Extrait un blob déchiffré d'une sauvegarde Lives."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_save_extract_blob_out"):
+            buf = (ctypes.c_ubyte * len(donnees)).from_buffer_copy(donnees)
+            out = NieBytes()
+            lib.nie_save_extract_blob_out(
+                buf, len(donnees), nom_fichier.encode("utf-8"), index_blob, ctypes.byref(out)
+            )
+            return prendre_octets(out)
+        return b""
+
+    @classmethod
+    def emu_registre(cls) -> dict[str, Any]:
+        """Retourne la matrice backend/capability de l'émulateur."""
+        from ._ffi import NieBytes, bibliotheque
+        from .formats import prendre_octets
+        import json
+
+        lib = bibliotheque()
+        if hasattr(lib, "nie_emu_registry_json_out"):
+            out = NieBytes()
+            lib.nie_emu_registry_json_out(ctypes.byref(out))
+            b = prendre_octets(out)
+            return json.loads(b) if b else {}
+        return {}
