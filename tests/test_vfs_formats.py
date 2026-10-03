@@ -105,3 +105,46 @@ def test_vfs_format_consumer_facade():
     assert len(VfsFormatConsumer.list_all()) >= 28
     assert VfsFormatConsumer.validate(14, b"CPK \x00\x00\x00\x00")
     assert VfsFormatConsumer.detect(b"G4TX\x00\x00\x00\x00").id == 1
+
+
+def test_scalar_names_preserve_catalog_labels_without_native(monkeypatch) -> None:
+    import niepy.formats as formats
+
+    def no_native():
+        raise FileNotFoundError("native library unavailable")
+
+    monkeypatch.setattr(formats, "bibliotheque", no_native)
+    assert formats.nom_format(formats.VfsFormatId.CFGBIN) == "cfg.bin"
+    assert formats.detect_format(b"RDBN" + bytes(28)).name == "cfg.bin"
+    assert formats.detect_format_pure(b"RDBN" + bytes(28)).name == "RDBN"
+    assert formats.list_vfs_formats()[0].mime_type == "image/x-level5-g4tx"
+
+
+def test_python_fallback_version_matches_package(monkeypatch) -> None:
+    import niepy
+    import niepy.formats as formats
+
+    def no_native():
+        raise FileNotFoundError("native library unavailable")
+
+    monkeypatch.setattr(formats, "bibliotheque", no_native)
+    assert formats.version() == f"pur-python-{niepy.__version__}"
+
+
+def test_fallback_catalog_and_scalar_metadata_match_native(monkeypatch) -> None:
+    from dataclasses import asdict
+    import niepy.formats as formats
+
+    try:
+        formats.bibliotheque()
+    except FileNotFoundError:
+        pytest.skip("Rust native library unavailable for independent metadata parity")
+    native_catalog = {d.id: asdict(d) for d in formats.list_vfs_formats()}
+    native_scalars = {i: asdict(formats.get_format_descriptor(i)) for i in range(1, 29)}
+
+    def no_native():
+        raise FileNotFoundError("native library unavailable")
+
+    monkeypatch.setattr(formats, "bibliotheque", no_native)
+    assert {d.id: asdict(d) for d in formats.list_vfs_formats()} == native_catalog
+    assert {i: asdict(formats.get_format_descriptor(i)) for i in range(1, 29)} == native_scalars

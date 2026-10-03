@@ -65,7 +65,9 @@ def _cmd_info(_args: argparse.Namespace) -> int:
     if p_iecode and IecodeBridge.est_disponible():
         print(f"iecode_ffi   {p_iecode} (v{IecodeBridge.version()} - {IecodeBridge.schema()})")
     else:
-        print("iecode_ffi   non disponible (construire via dotnet publish src/IECODE/Ffi)")
+        print(
+            "iecode_ffi   non disponible (dotnet publish src/IECODE/Ffi/IECODE.Ffi.csproj -c Release -r linux-x64 -p:PublishAot=true -p:NativeLib=Shared)"
+        )
 
     try:
         chemin = chemin_bibliotheque()

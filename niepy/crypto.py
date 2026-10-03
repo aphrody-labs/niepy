@@ -276,7 +276,12 @@ def decompress_crilayla(data: bytes | bytearray | memoryview) -> bytes:
         raise ValueError("Bloc brut CRILAYLA hors limites")
 
     total_size = CRILAYLA_RAW_HEADER_SIZE + uncompressed_size
-    output = bytearray(total_size)
+    if total_size > 256 * 1024 * 1024:
+        raise ValueError("CRILAYLA: decoded size exceeds 256 MiB budget")
+    try:
+        output = bytearray(total_size)
+    except MemoryError as error:
+        raise ValueError("CRILAYLA: output allocation failed") from error
     output[0:CRILAYLA_RAW_HEADER_SIZE] = input_bytes[raw_block_start:raw_block_end]
 
     if uncompressed_size == 0:

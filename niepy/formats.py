@@ -13,7 +13,7 @@ Fonctionne de manière hybride :
 from __future__ import annotations
 
 import ctypes
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import IntEnum
 import json
 from typing import Any
@@ -95,18 +95,18 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=1,
         name="G4TX",
         extension=".g4tx",
-        mime_type="image/x-g4tx",
+        mime_type="image/x-level5-g4tx",
         category="texture",
         is_big_endian=False,
         encryption_supported=False,
         compression_supported=True,
-        description="Level-5 Texture Container (main DDS BCn textures + atlas sprite subregions)",
+        description="Level-5 Texture Container (DDS BCn textures + atlas sprite subregions)",
     ),
     2: VfsFormatDescriptor(
         id=2,
         name="G4MD",
         extension=".g4md",
-        mime_type="model/x-g4md",
+        mime_type="model/x-level5-g4md",
         category="model",
         is_big_endian=False,
         encryption_supported=False,
@@ -117,7 +117,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=3,
         name="G4MG",
         extension=".g4mg",
-        mime_type="model/x-g4mg",
+        mime_type="model/x-level5-g4mg",
         category="model",
         is_big_endian=False,
         encryption_supported=False,
@@ -128,7 +128,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=4,
         name="G4MT",
         extension=".g4mt",
-        mime_type="model/x-g4mt",
+        mime_type="model/x-level5-g4mt",
         category="model",
         is_big_endian=False,
         encryption_supported=False,
@@ -139,7 +139,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=5,
         name="G4SK",
         extension=".g4sk",
-        mime_type="model/x-g4sk",
+        mime_type="model/x-level5-g4sk",
         category="model",
         is_big_endian=False,
         encryption_supported=False,
@@ -150,18 +150,18 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=6,
         name="G4PK",
         extension=".g4pk",
-        mime_type="application/x-g4pk",
+        mime_type="application/x-level5-g4pk",
         category="container",
         is_big_endian=False,
         encryption_supported=False,
         compression_supported=True,
-        description="Level-5 Package Container (multi-resource bundle for characters and stadiums)",
+        description="Level-5 Package Container (multi-resource bundle for characters and animations)",
     ),
     7: VfsFormatDescriptor(
         id=7,
         name="G4RA",
         extension=".g4ra",
-        mime_type="application/x-g4ra",
+        mime_type="application/x-level5-g4ra",
         category="container",
         is_big_endian=False,
         encryption_supported=False,
@@ -172,7 +172,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=8,
         name="AGI",
         extension=".agi",
-        mime_type="model/x-agi",
+        mime_type="application/x-level5-agi",
         category="model",
         is_big_endian=False,
         encryption_supported=False,
@@ -183,7 +183,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=9,
         name="OBJB",
         extension=".objb",
-        mime_type="application/x-objb",
+        mime_type="application/x-level5-objb",
         category="config",
         is_big_endian=False,
         encryption_supported=False,
@@ -194,8 +194,8 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=10,
         name="PXCL",
         extension=".pxcl",
-        mime_type="application/x-pxcl",
-        category="system",
+        mime_type="application/x-level5-pxcl",
+        category="collision",
         is_big_endian=False,
         encryption_supported=False,
         compression_supported=False,
@@ -205,7 +205,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=11,
         name="RDBN",
         extension=".cfg.bin",
-        mime_type="application/x-rdbn",
+        mime_type="application/x-level5-rdbn",
         category="config",
         is_big_endian=False,
         encryption_supported=True,
@@ -216,7 +216,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=12,
         name="MEVS",
         extension=".mevbin",
-        mime_type="application/x-mevs",
+        mime_type="application/x-level5-mevs",
         category="script",
         is_big_endian=False,
         encryption_supported=False,
@@ -227,7 +227,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=13,
         name="G4CM",
         extension=".g4cm",
-        mime_type="application/x-g4cm",
+        mime_type="application/x-level5-g4cm",
         category="script",
         is_big_endian=False,
         encryption_supported=False,
@@ -238,7 +238,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=14,
         name="CPK",
         extension=".cpk",
-        mime_type="application/x-cpk",
+        mime_type="application/x-crifs-cpk",
         category="container",
         is_big_endian=True,
         encryption_supported=True,
@@ -249,7 +249,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=15,
         name="AFS2",
         extension=".afs2",
-        mime_type="audio/x-afs2",
+        mime_type="audio/x-cri-afs2",
         category="audio",
         is_big_endian=False,
         encryption_supported=True,
@@ -304,7 +304,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=20,
         name="XPCK",
         extension=".xpck",
-        mime_type="application/x-xpck",
+        mime_type="application/x-level5-xpck",
         category="container",
         is_big_endian=False,
         encryption_supported=False,
@@ -315,7 +315,7 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=21,
         name="XFSA",
         extension=".xfsa",
-        mime_type="application/x-xfsa",
+        mime_type="application/x-level5-xfsa",
         category="container",
         is_big_endian=False,
         encryption_supported=False,
@@ -326,18 +326,18 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=22,
         name="CRILAYLA",
         extension=".crilayla",
-        mime_type="application/x-crilayla",
+        mime_type="application/x-cri-layla",
         category="container",
         is_big_endian=False,
         encryption_supported=False,
         compression_supported=True,
-        description="CRI Layla Reverse-Bitstream LZSS Compressed Container (16-byte header + bitstream + 0x100 raw)",
+        description="CRI Layla Reverse-Bitstream LZSS Compressed Container (16-byte header)",
     ),
     23: VfsFormatDescriptor(
         id=23,
         name="@ACB",
         extension=".acb",
-        mime_type="audio/x-acb",
+        mime_type="audio/x-cri-acb",
         category="audio",
         is_big_endian=True,
         encryption_supported=True,
@@ -346,9 +346,9 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
     ),
     24: VfsFormatDescriptor(
         id=24,
-        name="CRID",
+        name="USM",
         extension=".usm",
-        mime_type="video/x-usm",
+        mime_type="video/x-cri-usm",
         category="video",
         is_big_endian=True,
         encryption_supported=True,
@@ -357,9 +357,9 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
     ),
     25: VfsFormatDescriptor(
         id=25,
-        name="G4NV",
+        name="NAVM",
         extension=".g4nv",
-        mime_type="application/x-g4nv",
+        mime_type="application/x-level5-g4nv",
         category="system",
         is_big_endian=False,
         encryption_supported=False,
@@ -370,8 +370,8 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=26,
         name="COL",
         extension=".col",
-        mime_type="application/x-col",
-        category="system",
+        mime_type="application/x-level5-col",
+        category="collision",
         is_big_endian=False,
         encryption_supported=False,
         compression_supported=False,
@@ -381,8 +381,8 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=27,
         name="COLS",
         extension=".cols",
-        mime_type="application/x-cols",
-        category="system",
+        mime_type="application/x-level5-cols",
+        category="collision",
         is_big_endian=False,
         encryption_supported=False,
         compression_supported=False,
@@ -392,12 +392,12 @@ FORMAT_CATALOG_STATIC: dict[int, VfsFormatDescriptor] = {
         id=28,
         name="LIVE",
         extension=".live",
-        mime_type="application/x-nie-live",
+        mime_type="application/x-level5-live",
         category="system",
         is_big_endian=False,
         encryption_supported=True,
         compression_supported=False,
-        description="Level-5 Lives Save Container (002AB8F4-* CRC32-keyed XOR stream cipher, 0xEEFF blobs)",
+        description="Level-5 Lives Save Container (CRC32-keyed XOR cipher, 0xEEFF blobs)",
     ),
 }
 
@@ -423,7 +423,9 @@ def version() -> str:
         brut = bibliotheque().nie_version()
         return brut.decode("utf-8") if brut else "?"
     except Exception:
-        return "pur-python-0.1.0"
+        from . import __version__
+
+        return f"pur-python-{__version__}"
 
 
 def detecter_pur(donnees: bytes) -> int:
@@ -514,7 +516,16 @@ def nom_format(discriminant: int) -> str:
     except Exception:
         pass
     desc = FORMAT_CATALOG_STATIC.get(discriminant)
-    return desc.name if desc else "inconnu"
+    scalar_names = {
+        10: "col",
+        11: "cfg.bin",
+        12: "mevbin",
+        15: "AWB",
+        19: "WAV",
+        23: "ACB",
+        25: "G4NV",
+    }
+    return scalar_names.get(discriminant, desc.name if desc else "inconnu")
 
 
 def decoder(donnees: bytes) -> Any:
@@ -589,7 +600,7 @@ def get_format_descriptor(fmt_id: int) -> VfsFormatDescriptor:
         pass
 
     if fmt_id in FORMAT_CATALOG_STATIC:
-        return FORMAT_CATALOG_STATIC[fmt_id]
+        return replace(FORMAT_CATALOG_STATIC[fmt_id], name=nom_format(fmt_id))
 
     return VfsFormatDescriptor(
         id=fmt_id,

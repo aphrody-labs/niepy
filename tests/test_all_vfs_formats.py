@@ -24,7 +24,7 @@ ALL_28_TEST_MAGICS: list[tuple[int, str, bytes, str, str]] = [
     (7, "G4RA", b"G4RA\x00\x00\x00\x00", ".g4ra", "container"),
     (8, "AGI", b"AGI \x00\x00\x00\x00", ".agi", "model"),
     (9, "OBJB", b"OBJB\x00\x00\x00\x00", ".objb", "config"),
-    (10, "PXCL", b"PXCL\x00\x00\x00\x00", ".pxcl", "system"),
+    (10, "PXCL", b"PXCL\x00\x00\x00\x00", ".pxcl", "collision"),
     (11, "RDBN", b"RDBN\x50\x00\x01\x00", ".cfg.bin", "config"),
     (12, "MEVS", b"MEVS\x00\x00\x00\x00", ".mevbin", "script"),
     (13, "G4CM", b"G4CM\x00\x00\x00\x00", ".g4cm", "script"),
@@ -38,10 +38,10 @@ ALL_28_TEST_MAGICS: list[tuple[int, str, bytes, str, str]] = [
     (21, "XFSA", b"XFSA\x00\x00\x00\x00", ".xfsa", "container"),
     (22, "CRILAYLA", b"CRILAYLA\x00\x01\x00\x00", ".crilayla", "container"),
     (23, "@ACB", b"@ACB\x00\x00\x00\x00", ".acb", "audio"),
-    (24, "CRID", b"CRID\x00\x00\x00\x00", ".usm", "video"),
-    (25, "G4NV", b"G4NV\x00\x00\x00\x00", ".g4nv", "system"),
-    (26, "COL", b"COL\x00\x00\x00\x00\x00", ".col", "system"),
-    (27, "COLS", b"COLS\x00\x00\x00\x00", ".cols", "system"),
+    (24, "USM", b"CRID\x00\x00\x00\x00", ".usm", "video"),
+    (25, "NAVM", b"G4NV\x00\x00\x00\x00", ".g4nv", "system"),
+    (26, "COL", b"COL\x00\x00\x00\x00\x00", ".col", "collision"),
+    (27, "COLS", b"COLS\x00\x00\x00\x00", ".cols", "collision"),
     (28, "LIVE", b"\xc3\x66\xce\x9d\x00\x00\x00\x00", ".live", "system"),
 ]
 

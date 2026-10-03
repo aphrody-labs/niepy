@@ -21,7 +21,7 @@ Tout passe par `nie_ffi`, la bibliothèque native construite depuis les crates R
 l'avoir construite au moins une fois :
 
 ```bash
-cargo build -p nie-ffi --release
+cargo build -p aphrody-nie-ffi --release
 ```
 
 `niepy` la résout seule : `NIE_FFI_PATH` si elle est posée, sinon `target/release`, sinon
@@ -121,7 +121,7 @@ rendent la main qu'à sa fermeture : les appeler depuis un jeu déjà lancé le 
 Le binaire se construit à part :
 
 ```bash
-cargo build -p nie-game --release
+cargo build -p aphrody-nie-game --release
 ```
 
 ## Lire les scènes — ce dont un VN a réellement besoin

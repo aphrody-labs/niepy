@@ -72,7 +72,7 @@ def chemin_nie_game() -> Path:
     cherches = "\n  ".join(str(c) for c in candidats) or "  (racine du dépôt introuvable)"
     raise FileNotFoundError(
         "Binaire nie-game introuvable. Construis-le avec :\n"
-        "    cargo build -p nie-game --release\n"
+        "    cargo build -p aphrody-nie-game --release\n"
         "Chemins essayés :\n  " + cherches
     )
 

@@ -110,10 +110,19 @@ def _racine_depot() -> Path | None:
     return None
 
 
+def _installed_library_candidates(names: list[str]) -> list[Path]:
+    """Resolve the common user installation directory, then nonempty PATH entries."""
+    directories = [Path.home() / ".local" / "bin"]
+    directories.extend(
+        Path(entry).expanduser() for entry in os.environ.get("PATH", "").split(os.pathsep) if entry
+    )
+    return [directory / name for directory in dict.fromkeys(directories) for name in names]
+
+
 def chemin_bibliotheque() -> Path:
     """Résout le chemin de la lib native, ou lève `FileNotFoundError` en disant où chercher.
 
-    Ordre : `NIE_FFI_PATH` (fichier explicite), puis `target/release`, puis `target/debug`
+    Ordre : `NIE_FFI_PATH`, user install / PATH, puis `target/release` et `target/debug`
     sous la racine du dépôt.
     """
     force = os.environ.get("NIE_FFI_PATH", "").strip()
@@ -124,7 +133,7 @@ def chemin_bibliotheque() -> Path:
         return chemin
 
     racine = _racine_depot()
-    candidats: list[Path] = []
+    candidats = _installed_library_candidates(_noms_possibles())
     if racine is not None:
         for profil in ("release", "debug"):
             candidats.extend(racine / "target" / profil / nom for nom in _noms_possibles())
@@ -136,7 +145,7 @@ def chemin_bibliotheque() -> Path:
     cherches = "\n  ".join(str(c) for c in candidats) or "  (racine du dépôt introuvable)"
     raise FileNotFoundError(
         "Bibliothèque native nie_ffi introuvable. Construis-la avec :\n"
-        "    cargo build -p nie-ffi --release\n"
+        "    cargo build -p aphrody-nie-ffi --release\n"
         "puis relance. Chemins essayés :\n  " + cherches + "\n"
         "Tu peux aussi forcer NIE_FFI_PATH vers le fichier."
     )

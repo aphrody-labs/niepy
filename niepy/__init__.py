@@ -199,5 +199,22 @@ __all__ = [
     "version",
 ]
 
+
 #: Version de la bibliothèque Python.
-__version__ = "0.2.0"
+def _package_version() -> str:
+    from importlib.metadata import PackageNotFoundError, version as distribution_version
+    from pathlib import Path
+    import re
+
+    manifest = Path(__file__).resolve().parents[1] / "pyproject.toml"
+    if manifest.is_file():
+        match = re.search(r'^version\s*=\s*"([^"]+)"', manifest.read_text(), re.MULTILINE)
+        if match:
+            return match.group(1)
+    try:
+        return distribution_version("niepy")
+    except PackageNotFoundError:
+        return "unknown"
+
+
+__version__ = _package_version()

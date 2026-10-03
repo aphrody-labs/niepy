@@ -184,3 +184,12 @@ def test_is_live_save() -> None:
 
     corrupt = bytearray(16)
     assert not is_live_save(corrupt)
+
+
+def test_crilayla_oversized_and_exhausted_streams() -> None:
+    oversized = b"CRILAYLA" + struct.pack("<II", 0xFFFFFFFF, 0) + bytes(256)
+    with pytest.raises(ValueError, match="budget"):
+        decompress_crilayla(oversized)
+    exhausted = b"CRILAYLA" + struct.pack("<II", 32, 1) + b"\0" + bytes(256)
+    with pytest.raises(ValueError, match="épuisé"):
+        decompress_crilayla(exhausted)

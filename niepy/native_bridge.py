@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from ._ffi import _racine_depot
+from ._ffi import _installed_library_candidates, _racine_depot
 
 __all__ = [
     "IecodeBridge",
@@ -39,11 +39,14 @@ def chemin_iecode_ffi() -> Path | None:
         if p.is_file():
             return p
 
+    candidats = _installed_library_candidates(_noms_iecode_possibles())
+    for candidate in candidats:
+        if candidate.is_file():
+            return candidate
+
     racine = _racine_depot()
     if racine is None:
         return None
-
-    candidats: list[Path] = []
     # Chemins NativeAOT sous src/IECODE/Ffi/bin
     for profil in ("Release", "Debug"):
         for sub in ("publish", "native", ""):
@@ -141,7 +144,7 @@ class IecodeBridge:
         if p is None:
             raise FileNotFoundError(
                 "Bibliothèque IECODE.Ffi introuvable. Construisez-la avec :\n"
-                "    dotnet publish src/IECODE/Ffi/IECODE.Ffi.csproj -c Release /p:PublishAot=true\n"
+                "    dotnet publish src/IECODE/Ffi/IECODE.Ffi.csproj -c Release -r linux-x64 -p:PublishAot=true -p:NativeLib=Shared\n"
                 "ou définissez la variable d'environnement IECODE_FFI_PATH."
             )
         cls._instance = _IecodeFfiBindings(p)

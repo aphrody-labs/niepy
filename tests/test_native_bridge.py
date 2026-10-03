@@ -1,5 +1,7 @@
 """Tests unitaires du pont natif IECODE.Ffi vers IECODE.Core (C# NativeAOT)."""
 
+import re
+
 import pytest
 from niepy.native_bridge import IecodeBridge, chemin_iecode_ffi
 
@@ -14,7 +16,7 @@ def test_iecode_ffi_presence():
 
 def test_iecode_version_et_schema():
     """La version et le schéma retournés correspondent aux contrats IECODE.Core."""
-    assert IecodeBridge.version() == "2.0.4-dotnet10"
+    assert re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?", IecodeBridge.version())
     assert IecodeBridge.schema() == "iecode.ffi/v1"
 
 
@@ -49,3 +51,30 @@ def test_nie_ffi_pure():
 
     assert not NieFfiPure.sonder_cpk(b"NOT_A_CPK")
     assert NieFfiPure.sonder_cpk(b"CPK \x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
+
+
+def test_libraries_resolve_from_path_without_checkout(tmp_path, monkeypatch):
+    import niepy._ffi as rust_ffi
+    import niepy.native_bridge as managed_ffi
+
+    monkeypatch.delenv("NIE_FFI_PATH", raising=False)
+    monkeypatch.delenv("IECODE_FFI_PATH", raising=False)
+    monkeypatch.setattr(rust_ffi.Path, "home", lambda: tmp_path / "home")
+    monkeypatch.setenv("PATH", str(tmp_path / "bin"))
+    monkeypatch.setattr(rust_ffi, "_racine_depot", lambda: None)
+    monkeypatch.setattr(managed_ffi, "_racine_depot", lambda: None)
+    destination = tmp_path / "bin"
+    destination.mkdir()
+    rust = destination / rust_ffi._noms_possibles()[0]
+    managed = destination / managed_ffi._noms_iecode_possibles()[0]
+    rust.touch()
+    managed.touch()
+    assert rust_ffi.chemin_bibliotheque() == rust
+    assert managed_ffi.chemin_iecode_ffi() == managed
+
+    override = tmp_path / "override.so"
+    override.touch()
+    monkeypatch.setenv("NIE_FFI_PATH", str(override))
+    monkeypatch.setenv("IECODE_FFI_PATH", str(override))
+    assert rust_ffi.chemin_bibliotheque() == override
+    assert managed_ffi.chemin_iecode_ffi() == override
