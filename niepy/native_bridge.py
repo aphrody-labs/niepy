@@ -47,11 +47,11 @@ def chemin_iecode_ffi() -> Path | None:
     racine = _racine_depot()
     if racine is None:
         return None
-    # Chemins NativeAOT sous src/IECODE/Ffi/bin
+    # Chemins NativeAOT du membre .NET `apps/iecode-dotnet` (Ffi/bin)
     for profil in ("Release", "Debug"):
         for sub in ("publish", "native", ""):
             for arch in ("linux-x64", "win-x64", "osx-x64", ""):
-                base = racine / "src" / "IECODE" / "Ffi" / "bin" / profil / "net10.0"
+                base = racine / "apps" / "iecode-dotnet" / "Ffi" / "bin" / profil / "net10.0"
                 if arch:
                     base = base / arch
                 if sub:
@@ -144,7 +144,7 @@ class IecodeBridge:
         if p is None:
             raise FileNotFoundError(
                 "Bibliothèque IECODE.Ffi introuvable. Construisez-la avec :\n"
-                "    dotnet publish src/IECODE/Ffi/IECODE.Ffi.csproj -c Release -r linux-x64 -p:PublishAot=true -p:NativeLib=Shared\n"
+                "    dotnet publish apps/iecode-dotnet/Ffi/IECODE.Ffi.csproj -c Release -r <rid> -p:PublishAot=true\n"
                 "ou définissez la variable d'environnement IECODE_FFI_PATH."
             )
         cls._instance = _IecodeFfiBindings(p)

@@ -66,7 +66,7 @@ def _cmd_info(_args: argparse.Namespace) -> int:
         print(f"iecode_ffi   {p_iecode} (v{IecodeBridge.version()} - {IecodeBridge.schema()})")
     else:
         print(
-            "iecode_ffi   non disponible (dotnet publish src/IECODE/Ffi/IECODE.Ffi.csproj -c Release -r linux-x64 -p:PublishAot=true -p:NativeLib=Shared)"
+            "iecode_ffi   non disponible (dotnet publish apps/iecode-dotnet/Ffi/IECODE.Ffi.csproj -c Release -r <rid> -p:PublishAot=true)"
         )
 
     try:

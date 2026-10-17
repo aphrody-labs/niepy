@@ -191,14 +191,19 @@ def racine_jeu(explicite: str | os.PathLike[str] | None = None) -> Path:
     courant à la recherche de `data/cpk_list.cfg.bin`.
 
     Une variable d'environnement **posée mais vide** est ignorée : une chaîne vide n'est pas
-    une racine, et la traiter comme telle donne un chemin où rien n'est jamais trouvé.
+    une racine, et la traiter comme telle donne un chemin où rien n'est jamais trouvé. Une
+    variable qui pointe vers un dossier absent lève `FileNotFoundError` plutôt que de rendre
+    une racine où rien n'existe.
     """
     if explicite is not None:
         return Path(explicite)
 
     depuis_env = os.environ.get("NIE_GAME_DIR", "").strip()
     if depuis_env:
-        return Path(depuis_env)
+        racine = Path(depuis_env)
+        if not racine.is_dir():
+            raise FileNotFoundError(f"NIE_GAME_DIR pointe vers {racine}, qui n'est pas un dossier.")
+        return racine
 
     courant = Path.cwd().resolve()
     for ancetre in (courant, *courant.parents):
